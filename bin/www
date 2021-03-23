@@ -27,26 +27,27 @@ var io = require('socket.io')(server);
  * Socket Logic Start.
  */
 rooms = [];
+users = [];
 io.on('connection', socket => {
 
   //socket.js
-  // socket.on("user-connect", (user_id) => {
-  //   users.push({
-  //     "user_id": user_id,
-  //     "socket_id": socket.id
-  //   })
-  //   console.log(users);
-  // })
+  socket.on("user-connect", (user_id) => {
+    users.push({
+      "user_id": user_id,
+      "socket_id": socket.id
+    })
+    console.log(users);
+  })
 
-  // socket.on("add-user", (user_id, call_user_id) => {
-  //   call_user = null;
-  //   users.forEach(user => {
-  //     if (user.user_id == call_user_id) {
-  //       call_user = user;
-  //     }
-  //   });
-  //   socket.to(call_user.socket_id).emit("user-added", user_id);
-  // })
+  socket.on("add-user", (user_id, call_user_id) => {
+    call_user = null;
+    users.forEach(user => {
+      if (user.user_id == call_user_id) {
+        call_user = user;
+      }
+    });
+    socket.to(call_user.socket_id).emit("user-added", user_id);
+  })
   //socket.js
   //myscript.js
   // socket.on('open-room', (room_id, user_id) => {
@@ -103,14 +104,14 @@ io.on('connection', socket => {
   //myscript.js
 
 
-  socket.on('join-room', (roomId, userId) => {
-    console.log(roomId, userId);
-    socket.join(roomId);
-    socket.to(roomId).broadcast.emit('user-connected', userId);
-    socket.on('disconnect', () => {
-      socket.to(roomId).broadcast.emit('user-disconnected', userId);
-    });
-  });
+  // socket.on('join-room', (roomId, userId) => {
+  //   console.log(roomId, userId);
+  //   socket.join(roomId);
+  //   socket.to(roomId).broadcast.emit('user-connected', userId);
+  //   socket.on('disconnect', () => {
+  //     socket.to(roomId).broadcast.emit('user-disconnected', userId);
+  //   });
+  // });
 });
 
 /**
