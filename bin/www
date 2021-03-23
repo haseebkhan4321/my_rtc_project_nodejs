@@ -29,68 +29,88 @@ var io = require('socket.io')(server);
 rooms = [];
 io.on('connection', socket => {
 
-  socket.on('open-room', (room_id, user_id) => {
-    room = {};
-    room['room_id'] = room_id;
-    room['admin_id'] = user_id;
-    room['users'] = [];
-    if (rooms.find(room => room['room_id'] == room_id)) {
-      console.log('already-exists')
-      socket.emit('room-already-exists', room_id)
-    } else {
-      rooms.push(room);
-      socket.join(room_id);
-      socket.emit('room-opened', room);
-    }
-    console.log(room);
-  });
-  socket.on('join-room', (room_id, user_id) => {
-    rooms.find(room => {
-      user = {}
-      user['user_id'] = user_id;
-      console.log('join-room');
-      if (room['room_id'] == room_id) {
-        console.log('room exists');
-        if (room['users'].length !== 0) {
-          room['users'].find(user => {
-            if (user['user_id'] == user_id && room['admin_id'] == user_id) {
-              console.log('user already exists');
-              socket.emit('user-already-exists', {
-                user
-              })
-            } else {
-              console.log('exists');
-              room['users'].push(user);
-              socket.join(room['room_id']);
-              socket.to(room['room_id']).broadcast.emit('user-connected', {
-                room,
-                user
-              })
-            }
-          })
-        } else {
-          console.log('empty');
-          room['users'].push(user);
-          socket.join(room['room_id']);
-          socket.to(room['room_id']).broadcast.emit('user-connected', {
-            room,
-            user
-          })
-        }
-      }
-    });
-  });
+  //socket.js
+  // socket.on("user-connect", (user_id) => {
+  //   users.push({
+  //     "user_id": user_id,
+  //     "socket_id": socket.id
+  //   })
+  //   console.log(users);
+  // })
 
-
-
-  // socket.on('join-room', (roomId, userId) => {
-  //   console.log(roomId, userId);
-  //   socket.join(roomId);
-  //   socket.to(roomId).broadcast.emit('user-connected', userId);
-  //   socket.on('disconnect', () => {
-  //     socket.to(roomId).broadcast.emit('user-disconnected', userId);
+  // socket.on("add-user", (user_id, call_user_id) => {
+  //   call_user = null;
+  //   users.forEach(user => {
+  //     if (user.user_id == call_user_id) {
+  //       call_user = user;
+  //     }
+  //   });
+  //   socket.to(call_user.socket_id).emit("user-added", user_id);
+  // })
+  //socket.js
+  //myscript.js
+  // socket.on('open-room', (room_id, user_id) => {
+  //   room = {};
+  //   room['room_id'] = room_id;
+  //   room['admin_id'] = user_id;
+  //   room['users'] = [];
+  //   if (rooms.find(room => room['room_id'] == room_id)) {
+  //     console.log('already-exists')
+  //     socket.emit('room-already-exists', room_id)
+  //   } else {
+  //     rooms.push(room);
+  //     socket.join(room_id);
+  //     socket.emit('room-opened', room);
+  //   }
+  //   console.log(room);
+  // });
+  // socket.on('join-room', (room_id, user_id) => {
+  //   rooms.find(room => {
+  //     user = {}
+  //     user['user_id'] = user_id;
+  //     console.log('join-room');
+  //     if (room['room_id'] == room_id) {
+  //       console.log('room exists');
+  //       if (room['users'].length !== 0) {
+  //         room['users'].find(user => {
+  //           if (user['user_id'] == user_id && room['admin_id'] == user_id) {
+  //             console.log('user already exists');
+  //             socket.emit('user-already-exists', {
+  //               user
+  //             })
+  //           } else {
+  //             console.log('exists');
+  //             room['users'].push(user);
+  //             socket.join(room['room_id']);
+  //             socket.to(room['room_id']).broadcast.emit('user-connected', {
+  //               room,
+  //               user
+  //             })
+  //           }
+  //         })
+  //       } else {
+  //         console.log('empty');
+  //         room['users'].push(user);
+  //         socket.join(room['room_id']);
+  //         socket.to(room['room_id']).broadcast.emit('user-connected', {
+  //           room,
+  //           user
+  //         })
+  //       }
+  //     }
   //   });
   // });
+  //myscript.js
+
+
+  socket.on('join-room', (roomId, userId) => {
+    console.log(roomId, userId);
+    socket.join(roomId);
+    socket.to(roomId).broadcast.emit('user-connected', userId);
+    socket.on('disconnect', () => {
+      socket.to(roomId).broadcast.emit('user-disconnected', userId);
+    });
+  });
 });
 
 /**
